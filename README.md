@@ -17,7 +17,7 @@ MangroveAI adalah sistem klasifikasi daun bakau berbasis deep learning yang meng
 - **Antarmuka Web Responsif**: Dibangun dengan Flask untuk kemudahan akses
 - **Model CNN Terlatih**: Menggunakan arsitektur Convolutional Neural Network yang dioptimalkan
 
-📁 KlasifikasiMangrove/
+## 📁 KlasifikasiMangrove/
 ├── 📄 app.py                    # Aplikasi utama Flask
 ├── 📄 labels.json               # Label kelas untuk model AI
 ├── 📄 model_klasifikasi_pro.h5  # Model AI yang telah dilatih
