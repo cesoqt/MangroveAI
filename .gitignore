@@ -1,0 +1,38 @@
+# =========================
+# PYTHON CACHE
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# =========================
+# MODEL FILE (biar repo tidak berat)
+# =========================
+*.h5
+*.pb
+*.tflite
+*.pt
+*.pth
+*.onnx
+*.pkl
+*.joblib
+
+# Jika model kamu disimpan sebagai file lain (misal TensorFlow SavedModel)
+model/
+models/
+
+# =========================
+# FLASK PROJECT
+# =========================
+# Folder upload hasil user
+static/uploads/
+
+# =========================
+# SYSTEM FILES
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# dotenv file
+.env

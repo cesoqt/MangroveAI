@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mangrove Leaf Identifier | EcoAI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="#" class="logo">
+                    <i class="fas fa-leaf"></i>
+                    <span>Mangrove<span class="logo-highlight">AI</span></span>
+                </a>
+                <ul class="nav-links">
+                    <li><a href="#home"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="#identify"><i class="fas fa-camera"></i> Identify</a></li>
+                    <li><a href="#about"><i class="fas fa-info-circle"></i> About</a></li>
+                    <li><a href="#species"><i class="fas fa-tree"></i> Species</a></li>
+                    <li><a href="#contact"><i class="fas fa-envelope"></i> Contact</a></li>
+                </ul>
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">Identify Mangrove Leaves with <span class="highlight">AI Technology</span></h1>
+                <p class="hero-subtitle">Upload a leaf image or use your camera to instantly identify mangrove species with high accuracy.</p>
+                <a href="#identify" class="btn-primary">
+                    <i class="fas fa-play-circle"></i> Start Identifying
+                </a>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">3</span>
+                        <span class="stat-label">Species</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">95%</span>
+                        <span class="stat-label">Accuracy</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">24/7</span>
+                        <span class="stat-label">Available</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="{{ url_for('static', filename='images/hdp.jpg') }}" alt="Hacienda Del Party">
+            </div>
+        </div>
+    </section>
+
+    <!-- Identification Section -->
+    <section class="identification-section" id="identify">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Leaf Identification</h2>
+                <p class="section-subtitle">Identify one of 3 mangrove species: Avicennia alba, Rhizophora apiculata, or Sonneratia alba</p>
+            </div>
+
+            <div class="identification-cards">
+                <!-- Upload Card -->
+                <div class="card upload-card">
+                    <div class="card-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h3 class="card-title">Upload Image</h3>
+                    <p class="card-description">Upload a clear photo of a mangrove leaf from your device</p>
+                    
+                    <div class="upload-box">
+                        <form id="upload-form" method="POST" enctype="multipart/form-data">
+                            <div class="file-input-wrapper">
+                                <input type="file" name="file" id="file-input" accept="image/*" required>
+                                <label for="file-input" class="file-input-label">
+                                    <i class="fas fa-folder-open"></i> Choose File
+                                </label>
+                                <span class="file-name" id="file-name">No file selected</span>
+                            </div>
+                            <button type="submit" class="btn-secondary">
+                                <i class="fas fa-search"></i> Identify Leaf
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Camera Card -->
+                <div class="card camera-card">
+                    <div class="card-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <h3 class="card-title">Live Camera</h3>
+                    <p class="card-description">Use your device camera to capture a leaf in real-time</p>
+                    
+                    <div class="camera-controls">
+                        <button class="btn-secondary" onclick="openCamera()" id="open-camera-btn">
+                            <i class="fas fa-video"></i> Open Camera
+                        </button>
+                        
+                        <div class="camera-preview-container" id="camera-container" style="display:none;">
+                            <video id="camera-preview" autoplay playsinline></video>
+                            <div class="camera-buttons">
+                                <button class="btn-capture" onclick="takePhoto()" id="snap-btn">
+                                    <i class="fas fa-camera"></i> Capture
+                                </button>
+                                <button class="btn-secondary" id="switch-camera-btn" style="width: 50px; background: #FF9800; color: white;">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                                <button class="btn-cancel" onclick="closeCamera()">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <form id="camera-form" method="POST" enctype="multipart/form-data" style="display:none;">
+                            <canvas id="canvas"></canvas>
+                            <input type="hidden" name="file" id="camera-image">
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-container" id="results-section" style="display: none;">
+                
+                <div class="image-preview">
+                    <h3><i class="fas fa-image"></i> Image Preview</h3>
+                    <img id="result-image-preview" src="" alt="Uploaded leaf image">
+                </div>
+
+                <div class="result-card">
+                    <div class="result-header">
+                        <h3><i class="fas fa-leaf"></i> Identification Results</h3>
+                        <div class="confidence-badge">
+                            <span class="confidence-value" id="result-confidence">0%</span> confidence
+                        </div>
+                    </div>
+                    <div class="result-content">
+                        <div class="species-info">
+                            <h4 class="species-name" id="result-species-name">Detecting...</h4>
+                            
+                            <div id="dynamic-species-content">
+                                </div>
+
+                            <div class="habitat-info">
+                                <h5><i class="fas fa-tree"></i> Habitat & Distribution:</h5>
+                                <p id="result-habitat">...</p>
+                            </div>
+                        </div>
+                        
+                        <div class="result-actions">
+                            <button class="btn-outline" onclick="showMoreInfo()">
+                                <i class="fas fa-book"></i> Learn More
+                            </button>
+                            <button class="btn-outline" onclick="shareResult()">
+                                <i class="fas fa-share-alt"></i> Share
+                            </button>
+                            <button class="btn-outline" onclick="saveIdentification()">
+                                <i class="fas fa-save"></i> Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+    <!-- Species Section -->
+    <section class="species-section" id="species">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Mangrove Species in Our Database</h2>
+                <p class="section-subtitle">We can identify these 3 common mangrove species</p>
+            </div>
+            
+            <div class="species-grid">
+                <!-- Avicennia alba -->
+                <div class="species-card">
+                    <div class="species-image">
+                        <img src="{{ url_for('static', filename='images/avice.jpg') }}" alt="Avicennia alba">
+                    </div>
+                    <div class="species-content">
+                        <h3>AVICENNIA ALBA</h3>
+                        <p class="species-common">White Mangrove / Api-api Putih</p>
+                        <div class="species-characteristics">
+                            <span><i class="fas fa-leaf"></i> Lanceolate leaves</span>
+                            <span><i class="fas fa-ruler"></i> 5-12 cm</span>
+                            <span><i class="fas fa-palette"></i> Silvery underside</span>
+                        </div>
+                        <p class="species-description">Recognizable by its pointed leaves with distinctive silvery-white undersides and pencil-like pneumatophores.</p>
+                    </div>
+                </div>
+                
+                <!-- Rhizophora apiculata -->
+                <div class="species-card">
+                    <div class="species-image">
+                       <img src="{{ url_for('static', filename='images/rhizo1.jpg') }}" alt="Avicennia alba">
+                    </div>
+                    <div class="species-content">
+                        <h3>RHIZOPHORA APICULATA</h3>
+                        <p class="species-common">Bakau Minyak / Bakau Merah</p>
+                        <div class="species-characteristics">
+                            <span><i class="fas fa-leaf"></i> Elliptical leaves</span>
+                            <span><i class="fas fa-ruler"></i> 8-20 cm</span>
+                            <span><i class="fas fa-palette"></i> Reddish petiole</span>
+                        </div>
+                        <p class="species-description">Characterized by dark green elliptical leaves with pointed tips and prominent stilt root system.</p>
+                    </div>
+                </div>
+                
+                <!-- Sonneratia alba -->
+                <div class="species-card">
+                    <div class="species-image">
+                        <img src="{{ url_for('static', filename='images/sonne.jpg') }}" alt="Avicennia alba">
+                    </div>
+                    <div class="species-content">
+                        <h3>SONNERATIA ALBA</h3>
+                        <p class="species-common">Apple Mangrove / Perepat</p>
+                        <div class="species-characteristics">
+                            <span><i class="fas fa-leaf"></i> Oval leaves</span>
+                            <span><i class="fas fa-ruler"></i> 7-15 cm</span>
+                            <span><i class="fas fa-apple-alt"></i> Apple fruit</span>
+                        </div>
+                        <p class="species-description">Known for its rounded leaves and distinctive apple-shaped fruits. Often found in front mangrove zones.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about-section" id="about">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">About MangroveAI</h2>
+                <p class="section-subtitle">Using artificial intelligence to protect coastal ecosystems</p>
+            </div>
+            
+            <div class="about-content">
+                <div class="about-text">
+                    <h3>Our Mission</h3>
+                    <p>MangroveAI is dedicated to helping researchers, conservationists, and nature enthusiasts identify mangrove species quickly and accurately using machine learning technology.</p>
+                    
+                    <div class="features">
+                        <div class="feature">
+                            <i class="fas fa-bolt"></i>
+                            <h4>Fast Identification</h4>
+                            <p>Get results in seconds with our trained AI model</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-chart-line"></i>
+                            <h4>High Accuracy</h4>
+                            <p>Over 95% accuracy for common mangrove species</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-database"></i>
+                            <h4>3 Species Database</h4>
+                            <p>Specialized in Avicennia, Rhizophora, and Sonneratia</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-image">
+                    <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Mangrove Conservation">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-col">
+                    <div class="footer-logo">
+                        <i class="fas fa-leaf"></i>
+                        <span>Mangrove<span class="logo-highlight">AI</span></span>
+                    </div>
+                    <p class="footer-description">
+                        Using AI technology to identify and protect mangrove ecosystems worldwide. Specializing in 3 key mangrove species.
+                    </p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#identify">Identify</a></li>
+                        <li><a href="#species">Species</a></li>
+                        <li><a href="#about">About</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Species</h4>
+                    <ul>
+                        <li><a href="#species">Avicennia alba</a></li>
+                        <li><a href="#species">Rhizophora apiculata</a></li>
+                        <li><a href="#species">Sonneratia alba</a></li>
+                        <li><a href="#identify">Try Identification</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Contact Us</h4>
+                    <ul class="contact-info">
+                        <li><i class="fas fa-envelope"></i> info@mangroveai.org</li>
+                        <li><i class="fas fa-phone"></i> +62 21 1234 5678</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Jakarta, Indonesia</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2023 MangroveAI. All rights reserved. | Made with <i class="fas fa-heart"></i> for mangrove conservation in Indonesia</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
